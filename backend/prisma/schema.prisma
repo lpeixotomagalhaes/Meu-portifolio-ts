@@ -1,0 +1,51 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Project {
+  id         String   @id @default(uuid())
+  title      String
+  slug       String   @unique
+  subtitle   String
+  shortDesc  String
+  longDesc   String
+  coverImage String
+  aboutImage String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Skill {
+  id          String   @id @default(uuid())
+  name        String
+  description String
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+}
+
+model Message {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  company   String
+  content   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model Setting {
+  id           String   @id @default("global")
+  aboutText    String
+  cvUrl        String?
+  email        String
+  phone        String
+  linkedinUrl  String
+  instagramUrl String
+  updatedAt    DateTime @updatedAt
+}

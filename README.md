@@ -1,21 +1,57 @@
-# LKZ Frontend (Next.js)
+# LKZ Portfolio
 
-Public site + admin UI. Talks to the Express API and uses Supabase Auth for `/login`.
+Stack:
 
-See the root [README](../README.md) for full setup and deploy steps.
+- **Frontend:** Next.js on [Vercel](https://vercel.com) (repo root)
+- **Backend:** Express API on [Render](https://render.com) (`backend/`)
+- **Data / Auth:** [Supabase](https://supabase.com) (PostgreSQL + Auth)
 
-## Env
+> GitHub repo root = frontend. API is the `backend/` subfolder.
 
-Copy `.env.example` → `.env.local`:
+```
+Browser → Vercel (Next.js) → Render (Express + Prisma) → Supabase Postgres
+Browser → Supabase Auth (admin login JWT)
+```
 
-- `NEXT_PUBLIC_SUPABASE_URL`
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-- `NEXT_PUBLIC_API_URL` (local: `http://localhost:4000`)
+## Local setup
 
-## Scripts
+### 1. Supabase
+
+1. Create a project at https://supabase.com
+2. **Settings → Database** — copy pooler → `DATABASE_URL`, direct → `DIRECT_URL`
+3. **Settings → API** — URL, anon key, JWT secret
+4. **Authentication → Users** — create admin email/password for `/login`
+
+### 2. Backend
 
 ```bash
+cd backend
+cp .env.example .env
+npm install
+npx prisma migrate deploy
+npm run prisma:seed
 npm run dev
-npm run build
-npm start
 ```
+
+### 3. Frontend (repo root)
+
+```bash
+cp .env.example .env.local
+npm install
+npm run dev
+```
+
+## Production — Render (critical)
+
+Your failed deploy ran `frontend@0.1.0` / `next build` because **Root Directory was empty**.
+
+| Setting | Value |
+|---------|--------|
+| **Root Directory** | `backend` |
+| Build Command | `npm install && npx prisma generate && npm run build` |
+| Start Command | `npx prisma migrate deploy && npm start` |
+| Health Check Path | `/health` |
+
+Env vars: `DATABASE_URL`, `DIRECT_URL`, `SUPABASE_URL`, `SUPABASE_JWT_SECRET`, `CORS_ORIGIN`.
+
+Push the new `backend/` folder to GitHub first, then redeploy.
